@@ -54,23 +54,25 @@
 
 /* Hardware definitions... */
 #ifndef LIGHT
-#   define JTAG_PORT 	GPIOA
-#   define TDI_PIN	GPIO3
-#   define TMS_PIN	GPIO4
+#   define TDI_PORT 	GPIOA
+#   define TMS_PORT 	GPIOB
+#   define TDO_PORT 	GPIOA
+#   define TCK_PORT 	GPIOA
+
+#   define TDI_PIN	GPIO7
+#   define TMS_PIN	GPIO14
 #   define TCK_PIN	GPIO5
 #   define TDO_PIN	GPIO6
 
-#   define SWDP_PORT 	JTAG_PORT
+#   define SWDIO_PORT 	TMS_PORT
+#   define SWCLK_PORT 	TCK_PORT
 #   define SWDIO_PIN	TMS_PIN
 #   define SWCLK_PIN	TCK_PIN
 
-#   define USB_PU_PORT	GPIOA
-#   define USB_PU_PIN	GPIO8
-
-#   define LED_PORT	GPIOB
-#   define LED_RUN	GPIO2
-#   define LED_IDLE	GPIO10
-#   define LED_ERROR    GPIO11
+#   define LED_PORT	GPIOA
+#   define LED_RUN	GPIO8
+#   define LED_IDLE	GPIO8
+#   define LED_ERROR    GPIO8
 #else
 #   define JTAG_PORT 	GPIOA
 #   define TDI_PIN	GPIO3

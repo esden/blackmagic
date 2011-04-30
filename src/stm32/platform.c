@@ -66,22 +66,20 @@ int platform_init(void)
 	rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_AFIOEN);
 	AFIO_MAPR |= AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON;
 #endif
-	gpio_clear(USB_PU_PORT, USB_PU_PIN);
-	gpio_set_mode(USB_PU_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, 
-			USB_PU_PIN);
 
-	gpio_set_mode(JTAG_PORT, GPIO_MODE_OUTPUT_10_MHZ, 
+	gpio_set_mode(TMS_PORT, GPIO_MODE_OUTPUT_10_MHZ, 
 			GPIO_CNF_OUTPUT_PUSHPULL,
-			TMS_PIN | TCK_PIN | TDI_PIN);
+			TMS_PIN);
+	gpio_set_mode(TDI_PORT, GPIO_MODE_OUTPUT_10_MHZ, 
+			GPIO_CNF_OUTPUT_PUSHPULL,
+			TDI_PIN);
+	gpio_set_mode(TCK_PORT, GPIO_MODE_OUTPUT_10_MHZ, 
+			GPIO_CNF_OUTPUT_PUSHPULL,
+			TCK_PIN);
 
 	gpio_set_mode(LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, 
 			GPIO_CNF_OUTPUT_PUSHPULL, 
 			LED_RUN | LED_IDLE | LED_ERROR);
-
-	/* FIXME: This pin in intended to be input, but the TXS0108 fails
-	 * to release the device from reset if this floats. */
-	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, 
-			GPIO_CNF_OUTPUT_PUSHPULL, GPIO7);
 
 	/* Setup heartbeat timer */
 	systick_set_clocksource(STK_CTRL_CLKSOURCE_AHB_DIV8); 
@@ -91,9 +89,6 @@ int platform_init(void)
 
 #ifdef INCLUDE_UART_INTERFACE
 	uart_init();
-#endif
-#ifndef LIGHT
-	SCB_VTOR = 0x2000;	// Relocate interrupt vector table here
 #endif
 	cdcacm_init();
 

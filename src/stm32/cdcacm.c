@@ -326,7 +326,6 @@ static void dfu_detach_complete(struct usb_setup_data *req)
 	(void)req;
 
 	/* Disconnect USB cable */
-	gpio_set_mode(USB_PU_PORT, GPIO_MODE_INPUT, 0, USB_PU_PIN);
 
 	/* Assert boot-request pin */
 	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, 
@@ -467,10 +466,6 @@ void cdcacm_init(void)
 	usbd_register_set_config_callback(cdcacm_set_config);
 
 	nvic_enable_irq(NVIC_USB_LP_CAN_RX0_IRQ);
-
-	gpio_set(USB_PU_PORT, USB_PU_PIN);
-	gpio_set_mode(USB_PU_PORT, GPIO_MODE_OUTPUT_10_MHZ, 
-			GPIO_CNF_OUTPUT_PUSHPULL, USB_PU_PIN);
 }
 
 void usb_lp_can_rx0_isr(void)
