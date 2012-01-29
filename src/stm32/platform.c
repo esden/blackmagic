@@ -22,12 +22,12 @@
  * implementation.
  */
 
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/f1/rcc.h>
 #include <libopencm3/stm32/systick.h>
-#include <libopencm3/stm32/scb.h>
+#include <libopencm3/stm32/f1/scb.h>
 #include <libopencm3/stm32/nvic.h>
 #include <libopencm3/stm32/usart.h>
+#include <libopencm3/usb/usbd.h>
 
 #include "platform.h"
 #include "jtag_scan.h"
@@ -48,11 +48,7 @@ static void uart_init(void);
 
 int platform_init(void)
 {
-#ifndef LIGHT
 	rcc_clock_setup_in_hse_8mhz_out_72mhz();
-#else
-	rcc_clock_setup_in_hsi_out_48mhz();
-#endif
 
 	/* Enable peripherals */
 	rcc_peripheral_enable_clock(&RCC_APB1ENR, RCC_APB1ENR_USBEN);
@@ -62,11 +58,6 @@ int platform_init(void)
 	rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_IOPDEN);
 
 	/* Setup GPIO ports */
-#ifdef LIGHT
-	rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_AFIOEN);
-	AFIO_MAPR |= AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON;
-#endif
-
 	gpio_set_mode(TMS_PORT, GPIO_MODE_OUTPUT_10_MHZ, 
 			GPIO_CNF_OUTPUT_PUSHPULL,
 			TMS_PIN);

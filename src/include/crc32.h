@@ -18,18 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SWDPTAP_H
-#define __SWDPTAP_H
+#ifndef __CRC32_H
+#define __CRC32_H
 
-#include "general.h"
+#include "platform.h"
 
-int swdptap_init(void);
-void swdptap_reset(void);
-
-uint32_t swdptap_seq_in(int ticks);
-uint8_t swdptap_seq_in_parity(uint32_t *data, int ticks);
-void swdptap_seq_out(uint32_t MS, int ticks);
-void swdptap_seq_out_parity(uint32_t MS, int ticks);
+uint32_t crc32_calc(uint32_t crc, uint8_t data);
+uint32_t generic_crc32(struct target_s *target, uint32_t base, int len);
 
 #endif
-

@@ -27,18 +27,22 @@
 
 #include "gdb_if.h"
 
-#define VIRTUAL_COM_PORT_DATA_SIZE 64
-
 static uint32_t count_out;
 static uint32_t count_in;
 static uint32_t out_ptr;
-static uint8_t buffer_out[VIRTUAL_COM_PORT_DATA_SIZE];
-static uint8_t buffer_in[VIRTUAL_COM_PORT_DATA_SIZE];
+static uint8_t buffer_out[CDCACM_PACKET_SIZE];
+static uint8_t buffer_in[CDCACM_PACKET_SIZE];
 
 void gdb_if_putchar(unsigned char c, int flush)
 {
 	buffer_in[count_in++] = c;
-	if(flush || (count_in == VIRTUAL_COM_PORT_DATA_SIZE)) {
+	if(flush || (count_in == CDCACM_PACKET_SIZE)) {
+		/* Refuse to send if USB isn't configured, and
+		 * don't bother if nobody's listening */
+		if((cdcacm_get_config() != 1) || !cdcacm_get_dtr()) {
+			count_in = 0;
+			return;
+		}
 		while(usbd_ep_write_packet(1, buffer_in, count_in) <= 0);
 		count_in = 0;
 	}
@@ -47,9 +51,13 @@ void gdb_if_putchar(unsigned char c, int flush)
 unsigned char gdb_if_getchar(void)
 {
 	while(!(out_ptr < count_out)) {
+		/* Detach if port closed */
+		if(!cdcacm_get_dtr())
+			return 0x04;
+
 		while(cdcacm_get_config() != 1);
 		count_out = usbd_ep_read_packet(1, buffer_out, 
-					VIRTUAL_COM_PORT_DATA_SIZE);
+					CDCACM_PACKET_SIZE);
 		out_ptr = 0;
 	}
 
@@ -61,8 +69,12 @@ unsigned char gdb_if_getchar_to(int timeout)
 	timeout_counter = timeout/100;
 
 	if(!(out_ptr < count_out)) do {
+		/* Detach if port closed */
+		if(!cdcacm_get_dtr())
+			return 0x04;
+
 		count_out = usbd_ep_read_packet(1, buffer_out, 
-					VIRTUAL_COM_PORT_DATA_SIZE);
+					CDCACM_PACKET_SIZE);
 		out_ptr = 0;
 	} while(timeout_counter && !(out_ptr < count_out));
 

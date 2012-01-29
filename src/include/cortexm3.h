@@ -23,6 +23,9 @@
 
 #include "target.h"
 
+/* target options recognised by the Cortex-M target */
+#define	TOPT_FLAVOUR_V6M	(1<<0)		/* if not set, target is assumed to be v7m */
+
 int cm3_probe(struct target_s *target);
 
 #endif

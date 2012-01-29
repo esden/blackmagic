@@ -18,18 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SWDPTAP_H
-#define __SWDPTAP_H
+#ifndef __NXP_TGT_H
+#define __NXP_TGT_H
 
-#include "general.h"
+#include "target.h"
 
-int swdptap_init(void);
-void swdptap_reset(void);
-
-uint32_t swdptap_seq_in(int ticks);
-uint8_t swdptap_seq_in_parity(uint32_t *data, int ticks);
-void swdptap_seq_out(uint32_t MS, int ticks);
-void swdptap_seq_out_parity(uint32_t MS, int ticks);
+int lpc11xx_probe(struct target_s *target);
 
 #endif
-

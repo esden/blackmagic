@@ -24,14 +24,16 @@
 #ifndef __PLATFORM_H
 #define __PLATFORM_H
 
-#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/f1/gpio.h>
 
 #include <setjmp.h>
 #include <alloca.h>
 
 #include "gdb_packet.h"
 
-//#define INCLUDE_UART_INTERFACE
+#define INCLUDE_UART_INTERFACE
+#define INLINE_GPIO
+#define CDCACM_PACKET_SIZE 	64
 
 /* Important pin mappings for STM32 implementation:
  *
@@ -53,7 +55,6 @@
  */
 
 /* Hardware definitions... */
-#ifndef LIGHT
 #   define TDI_PORT 	GPIOA
 #   define TMS_PORT 	GPIOB
 #   define TDO_PORT 	GPIOA
@@ -70,23 +71,9 @@
 #   define SWCLK_PIN	TCK_PIN
 
 #   define LED_PORT	GPIOA
-#   define LED_RUN	GPIO8
-#   define LED_IDLE	GPIO8
-#   define LED_ERROR    GPIO8
-#else
-#   define JTAG_PORT 	GPIOA
-#   define TDI_PIN	GPIO3
-#   define TMS_PIN	GPIO2
-#   define TCK_PIN	GPIO7
-#   define TDO_PIN	GPIO6
-
-#   define SWDP_PORT 	JTAG_PORT
-#   define SWDIO_PIN	TMS_PIN
-#   define SWCLK_PIN	TCK_PIN
-
-#   define USB_PU_PORT	GPIOA
-#   define USB_PU_PIN	GPIO15
-#endif
+#   define LED_RUN	GPIO9
+#   define LED_IDLE	GPIO9
+#   define LED_ERROR    GPIO9
 
 #define DEBUG(...)
 
@@ -126,11 +113,32 @@ void morse(const char *msg, char repeat);
 void cdcacm_init(void);
 /* Returns current usb configuration, or 0 if not configured. */
 int cdcacm_get_config(void);
+int cdcacm_get_dtr(void);
 
 /* Use newlib provided integer only stdio functions */
 #define sscanf siscanf
 #define sprintf siprintf
 #define vasprintf vasiprintf
+
+#ifdef INLINE_GPIO
+static inline void _gpio_set(u32 gpioport, u16 gpios)
+{
+	GPIO_BSRR(gpioport) = gpios;
+}
+#define gpio_set _gpio_set
+
+static inline void _gpio_clear(u32 gpioport, u16 gpios)
+{
+	GPIO_BRR(gpioport) = gpios;
+}
+#define gpio_clear _gpio_clear
+
+static inline u16 _gpio_get(u32 gpioport, u16 gpios)
+{
+	return (u16)GPIO_IDR(gpioport) & gpios;
+}
+#define gpio_get _gpio_get
+#endif
 
 #endif
 

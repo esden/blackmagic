@@ -1,15 +1,15 @@
-ifndef HOST
-HOST = stm32
+ifndef PROBE_HOST
+PROBE_HOST = stm32
 endif
 
-VPATH += $(HOST)
+VPATH += $(PROBE_HOST)
 
 BUILDDATE := `date +"%Y%m%d"`
 
 CFLAGS += -Wall -Wextra -Wno-pointer-sign -Wno-char-subscripts\
-	-O0 -std=gnu99 -g3 -DBUILDDATE=\"$(BUILDDATE)\"\
-	-I. -Iinclude -I$(HOST) \
-	-DVERSION_SUFFIX=\"`../scripts/setlocalversion`\"
+	-O2 -std=gnu99 -g3 -DBUILDDATE=\"$(BUILDDATE)\"\
+	-I. -Iinclude -I$(PROBE_HOST) \
+	-DVERSION_SUFFIX=\"`../scripts/setlocalversion`\" -MD
 
 SRC = 	gdb_if.c	\
 	gdb_packet.c	\
@@ -21,6 +21,7 @@ SRC = 	gdb_if.c	\
 	adiv5_swdp.c	\
 	cortexm3.c	\
 	stm32_tgt.c	\
+	nxp_tgt.c	\
 	main.c		\
 	platform.c	\
 	command.c	\
@@ -28,8 +29,10 @@ SRC = 	gdb_if.c	\
 	adiv5_jtagdp.c	\
 	lmi.c		\
 	arm7tdmi.c	\
+	stm32f4.c	\
+	crc32.c		\
 
-include $(HOST)/Makefile.inc
+include $(PROBE_HOST)/Makefile.inc
 
 OBJ = $(SRC:.c=.o)
 
@@ -40,4 +43,6 @@ blackmagic: $(OBJ)
 
 clean:	host_clean
 	$(RM) *.o *~ blackmagic $(HOSTFILES)
+
+-include *.d
 

@@ -17,19 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef __STM32MEM_H
+#define __STM32MEM_H
 
-#ifndef __SWDPTAP_H
-#define __SWDPTAP_H
+#include <usb.h>
 
-#include "general.h"
-
-int swdptap_init(void);
-void swdptap_reset(void);
-
-uint32_t swdptap_seq_in(int ticks);
-uint8_t swdptap_seq_in_parity(uint32_t *data, int ticks);
-void swdptap_seq_out(uint32_t MS, int ticks);
-void swdptap_seq_out_parity(uint32_t MS, int ticks);
+int stm32_mem_erase(usb_dev_handle *dev, uint16_t iface, uint32_t addr);
+int stm32_mem_write(usb_dev_handle *dev, uint16_t iface, void *data, int size);
+int stm32_mem_manifest(usb_dev_handle *dev, uint16_t iface);
 
 #endif
 

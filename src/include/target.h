@@ -136,6 +136,7 @@ typedef struct target_s {
 
 	/* Register access functions */
 	int regs_size;
+	const char *tdesc;
 	int (*regs_read)(struct target_s *target, void *data);
 	int (*regs_write)(struct target_s *target, const void *data);
 
@@ -157,6 +158,9 @@ typedef struct target_s {
 	int (*clear_hw_wp)(struct target_s *target, uint8_t type, uint32_t addr, uint8_t len);
 
 	int (*check_hw_wp)(struct target_s *target, uint32_t *addr);
+
+	/* target-defined options */
+	unsigned target_options;
 
 	/* Flash memory access functions */
 	const char *xml_mem_map;

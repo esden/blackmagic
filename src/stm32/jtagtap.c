@@ -20,7 +20,6 @@
 
 /* This file implements the low-level JTAG TAP interface.  */
 
-#include <libopencm3/stm32/gpio.h>
 #include <stdio.h>
 
 #include "general.h"
@@ -30,7 +29,7 @@
 int jtagtap_init(void)
 {
 	gpio_set_mode(TMS_PORT, GPIO_MODE_OUTPUT_10_MHZ, 
-		GPIO_CNF_OUTPUT_PUSHPULL, TMS_PIN); 
+                      GPIO_CNF_OUTPUT_PUSHPULL, TMS_PIN); 
 
 	/* Go to JTAG mode for SWJ-DP */
 	for(int i = 0; i <= 50; i++) jtagtap_next(1, 0); /* Reset SW-DP */

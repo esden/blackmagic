@@ -17,19 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+.section .rodata
+.global _bindata, _bindatalen
 
-#ifndef __SWDPTAP_H
-#define __SWDPTAP_H
+_bindata:
+	.incbin "../src/blackmagic.bin"
 
-#include "general.h"
-
-int swdptap_init(void);
-void swdptap_reset(void);
-
-uint32_t swdptap_seq_in(int ticks);
-uint8_t swdptap_seq_in_parity(uint32_t *data, int ticks);
-void swdptap_seq_out(uint32_t MS, int ticks);
-void swdptap_seq_out_parity(uint32_t MS, int ticks);
-
-#endif
+_bindatalen:
+	.word . - _bindata
 

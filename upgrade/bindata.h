@@ -17,19 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef __BINDATA_H
+#define __BINDATA_H
 
-#ifndef __SWDPTAP_H
-#define __SWDPTAP_H
+#ifndef WIN32
+#define bindatalen _bindatalen
+#define bindata _bindata
+#endif
 
-#include "general.h"
-
-int swdptap_init(void);
-void swdptap_reset(void);
-
-uint32_t swdptap_seq_in(int ticks);
-uint8_t swdptap_seq_in_parity(uint32_t *data, int ticks);
-void swdptap_seq_out(uint32_t MS, int ticks);
-void swdptap_seq_out_parity(uint32_t MS, int ticks);
+extern const uint32_t bindatalen;
+extern const uint8_t bindata[];
 
 #endif
 

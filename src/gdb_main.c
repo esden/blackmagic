@@ -45,6 +45,7 @@
 #include "target.h"
 
 #include "command.h"
+#include "crc32.h"
 
 #define BUF_SIZE	1024
 
@@ -55,8 +56,6 @@ static unsigned char pbuf[BUF_SIZE];
 
 static void handle_q_packet(char *packet, int len);
 static void handle_v_packet(char *packet, int len);
-
-uint32_t arm_regs[16];
 
 void
 gdb_main(void)
@@ -70,13 +69,13 @@ gdb_main(void)
 		SET_IDLE_STATE(1);
 		size = gdb_getpacket(pbuf, BUF_SIZE);
 		SET_IDLE_STATE(0);
-		DEBUG("%s\n", pbuf);
 		switch(pbuf[0]) {
 		    /* Implementation of these is mandatory! */
 		    case 'g': { /* 'g': Read general registers */
+			uint32_t arm_regs[cur_target->regs_size];
 			ERROR_IF_NO_TARGET();
 			target_regs_read(cur_target, (void*)arm_regs);
-			gdb_putpacket(hexify(pbuf, (void*)arm_regs, sizeof(arm_regs)), sizeof(arm_regs)*2);
+			gdb_putpacket(hexify(pbuf, (void*)arm_regs, cur_target->regs_size), cur_target->regs_size * 2);
 			break;
 		    }
 		    case 'm': {	/* 'm addr,len': Read len bytes from addr */
@@ -98,13 +97,14 @@ gdb_main(void)
 			free(mem);
 			break;
 		    }
-		    case 'G':	/* 'G XX': Write general registers */
+		    case 'G': {	/* 'G XX': Write general registers */
+			uint32_t arm_regs[cur_target->regs_size];
 			ERROR_IF_NO_TARGET();
 			unhexify((void*)arm_regs, &pbuf[1], cur_target->regs_size);
 			target_regs_write(cur_target, arm_regs);
 			gdb_putpacket("OK", 2);
 			break;
-
+		    }
 		    case 'M': { /* 'M addr,len:XX': Write len bytes to addr */
 			unsigned long addr, len;
 			int hex;
@@ -151,11 +151,13 @@ gdb_main(void)
 			}
 
 			/* Wait for target halt */
-			while(!target_halt_wait(cur_target)) 
-				if(gdb_if_getchar_to(0) == '\x03') {
+			while(!target_halt_wait(cur_target)) { 
+				unsigned char c = gdb_if_getchar_to(0);
+				if((c == '\x03') || (c == '\x04')) {
 					target_halt_request(cur_target);
 					sent_int = 1;
 				}
+			}
 
 			SET_RUN_STATE(0);
 			/* Report reason for halt */
@@ -184,7 +186,8 @@ gdb_main(void)
 
 		    case 0x04:
                     case 'D':	/* GDB 'detach' command. */
-			if(cur_target) target_detach(cur_target);
+			if(cur_target) 
+				target_detach(cur_target);
 			last_target = cur_target;
 			cur_target = NULL;
 			gdb_putpacket("OK", 2);
@@ -283,17 +286,39 @@ gdb_main(void)
 		    }
 
 		    default: 	/* Packet not implemented */
-			DEBUG("Unsupported packet: %s\n", pbuf);
+			DEBUG("*** Unsupported packet: %s\n", pbuf);
 			gdb_putpacket("", 0);
 		}
 	}
 }
 
+static void
+handle_q_string_reply(const char *str, const char *param)
+{
+	unsigned long addr, len;
+	
+	if (sscanf(param, "%08lX,%08lX", &addr, &len) != 2) {
+		gdb_putpacketz("E01");
+		return;
+	}
+	if (addr < strlen (str)) {
+		uint8_t reply[len+2];
+		reply[0] = 'm';
+		strncpy (reply + 1, &str[addr], len);
+		if(len > strlen(&str[addr])) 
+			len = strlen(&str[addr]);
+		gdb_putpacket(reply, len + 1);
+	} else if (addr == strlen (str)) {
+		gdb_putpacketz("l");
+	} else
+		gdb_putpacketz("E01");
+}
 
 static void
 handle_q_packet(char *packet, int len)
 {
-	/* These 'monitor' commands only available on the real deal */
+	uint32_t addr, alen;
+
 	if(!strncmp(packet, "qRcmd,", 6)) {
 		unsigned char *data;
 		int datalen;
@@ -311,12 +336,10 @@ handle_q_packet(char *packet, int len)
 
 	} else if (!strncmp (packet, "qSupported", 10)) {
 		/* Query supported protocol features */
-		gdb_putpacket_f("PacketSize=%X;qXfer:memory-map:read+", BUF_SIZE);
+		gdb_putpacket_f("PacketSize=%X;qXfer:memory-map:read+;qXfer:features:read+", BUF_SIZE);
 
 	} else if (strncmp (packet, "qXfer:memory-map:read::", 23) == 0) {
 		/* Read target XML memory map */
-		unsigned long addr, len;
-		sscanf(packet+23, "%08lX,%08lX", &addr, &len);
 		if((!cur_target) && last_target) {
 			/* Attach to last target if detached. */
 			cur_target = last_target;
@@ -326,17 +349,26 @@ handle_q_packet(char *packet, int len)
 			gdb_putpacketz("E01");
 			return;
 		}
-		if (addr < strlen (cur_target->xml_mem_map)) {
-			uint8_t reply[len+2];
-			reply[0] = 'm';
-			strncpy (reply + 1, &cur_target->xml_mem_map[addr], len);
-			if(len > strlen(&cur_target->xml_mem_map[addr])) 
-				len = strlen(&cur_target->xml_mem_map[addr]);
-			gdb_putpacket(reply, len + 1);
-		} else if (addr == strlen (cur_target->xml_mem_map)) {
-			gdb_putpacketz("l");
-		} else
+		handle_q_string_reply(cur_target->xml_mem_map, packet + 23);
+
+	} else if (strncmp (packet, "qXfer:features:read:target.xml:", 31) == 0) {
+		/* Read target description */
+		if((!cur_target) && last_target) {
+			/* Attach to last target if detached. */
+			cur_target = last_target;
+			target_attach(cur_target);
+		}
+		if((!cur_target) || (!cur_target->tdesc)) {
 			gdb_putpacketz("E01");
+			return;
+		}
+		handle_q_string_reply(cur_target->tdesc, packet + 31);
+	} else if (sscanf(packet, "qCRC:%08lX,%08lX", &addr, &alen) == 2) {
+		if(!cur_target) {
+			gdb_putpacketz("E01");
+			return;
+		}
+		gdb_putpacket_f("C%lx", generic_crc32(cur_target, addr, alen));
 
 	} else gdb_putpacket("", 0);
 }
