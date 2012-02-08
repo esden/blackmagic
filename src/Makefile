@@ -9,7 +9,7 @@ BUILDDATE := `date +"%Y%m%d"`
 CFLAGS += -Wall -Wextra -Wno-pointer-sign -Wno-char-subscripts\
 	-Os -std=gnu99 -DBUILDDATE=\"$(BUILDDATE)\"\
 	-I. -Iinclude -I$(PROBE_HOST) \
-	-DVERSION_SUFFIX=\"`../scripts/setlocalversion`\" -MD
+	-DVERSION_SUFFIX=\"`../scripts/setlocalversion`\" -MD -ffunction-sections -fdata-sections
 
 SRC = 	gdb_if.c	\
 	gdb_packet.c	\
