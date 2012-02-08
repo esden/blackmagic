@@ -1,7 +1,7 @@
 CROSS_COMPILE ?= arm-none-eabi-
 CC = $(CROSS_COMPILE)gcc
 OBJCOPY = $(CROSS_COMPILE)objcopy
-LIBOPENCM3 ?= /usr/local/arm-none-eabi
+LIBOPENCM3 ?= ~/sat/arm-none-eabi
 
 CFLAGS += -Istm32/include -mcpu=cortex-m3 -mthumb -msoft-float -DSTM32F1 -I$(LIBOPENCM3)/include 
 LDFLAGS_BOOT = -lopencm3_stm32f1 -Wl,--defsym,_stack=0x20004000 \
