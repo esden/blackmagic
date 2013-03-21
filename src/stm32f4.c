@@ -38,9 +38,11 @@
 #include "target.h"
 #include "command.h"
 
+static bool stm32f4_cmd_erase_mass(target *t);
 static bool stm32f4_cmd_option(target *t, int argc, char *argv[]);
 
 const struct command_s stm32f4_cmd_list[] = {
+	{"erase_mass", (cmd_handler)stm32f4_cmd_erase_mass, "Erase entire flash memory"},
 	{"option", (cmd_handler)stm32f4_cmd_option, "Manipulate option bytes"},
 	{NULL, NULL, NULL}
 };
@@ -167,6 +169,13 @@ bool stm32f4_probe(struct target_s *target)
 	return false;
 }
 
+static void stm32f4_flash_unlock(ADIv5_AP_t *ap)
+{
+
+	/* Enable FPEC controller access */
+	adiv5_ap_mem_write(ap, FLASH_KEYR, KEY1);
+	adiv5_ap_mem_write(ap, FLASH_KEYR, KEY2);
+}
 
 static int stm32f4_flash_erase(struct target_s *target, uint32_t addr, int len)
 {
@@ -177,9 +186,8 @@ static int stm32f4_flash_erase(struct target_s *target, uint32_t addr, int len)
 
 	addr &= 0x07FFC000;
 
-	/* Enable FPEC controller access */
-	adiv5_ap_mem_write(ap, FLASH_KEYR, KEY1);
-	adiv5_ap_mem_write(ap, FLASH_KEYR, KEY2);
+	stm32f4_flash_unlock(ap);
+
 	while(len) {
 		if (addr < 0x10000) { /* Sector 0..3 */
 			cr = (addr >> 11);
@@ -249,6 +257,29 @@ static int stm32f4_flash_write(struct target_s *target, uint32_t dest,
 		return -1;
 
 	return 0;
+}
+
+static bool stm32f4_cmd_erase_mass(target *t)
+{
+	ADIv5_AP_t *ap = adiv5_target_ap(t);
+
+	stm32f4_flash_unlock(ap);
+
+	/* Flash mass erase start instruction */
+	adiv5_ap_mem_write(ap, FLASH_CR, FLASH_CR_MER);
+	adiv5_ap_mem_write(ap, FLASH_CR, FLASH_CR_STRT | FLASH_CR_MER);
+
+	/* Read FLASH_SR to poll for BSY bit */
+	while(adiv5_ap_mem_read(ap, FLASH_SR) & FLASH_SR_BSY)
+		if(target_check_error(t))
+			return false;
+
+	/* Check for error */
+	uint16_t sr = adiv5_ap_mem_read(ap, FLASH_SR);
+	if ((sr & SR_ERROR_MASK) || !(sr & SR_EOP))
+		return false;
+
+	return true;
 }
 
 static bool stm32f4_option_write(target *t, uint32_t value)
