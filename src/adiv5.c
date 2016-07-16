@@ -171,11 +171,24 @@ static const struct {
 	{0x00b, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M0 BPU",  "(Breakpoint Unit)")},
 	{0x00c, aa_cortexm,   cidc_gipc,    PIDR_PN_BIT_STRINGS("Cortex-M4 SCS",  "(System Control Space)")},
 	{0x00d, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight ETM11", "(Embedded Trace)")},
+	{0x00e, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M7 FPB",  "(Flash Patch and Breakpoint)")},
 	{0x490, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A15 GIC", "(Generic Interrupt Controller)")},
+	{0x4a1, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A53 ROM", "(v8 Memory Map ROM Table)")},
+	{0x4a2, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A57 ROM", "(ROM Table)")},
+	{0x4a3, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A53 ROM", "(v7 Memory Map ROM Table)")},
+	{0x4a4, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A72 ROM", "(ROM Table)")},
+	{0x4af, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A15 ROM", "(ROM Table)")},
+	{0x4c0, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M0+ ROM", "(ROM Table)")},
+	{0x4c3, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M3 ROM",  "(ROM Table)")},
+	{0x4c4, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M4 ROM",  "(ROM Table)")},
 	{0x4c7, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M7 PPB",  "(Private Peripheral Bus ROM Table)")},
+	{0x4c8, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M7 ROM",  "(ROM Table)")},
+	{0x470, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M1 ROM",  "(ROM Table)")},
+	{0x471, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M0 ROM",  "(ROM Table)")},
 	{0x906, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight CTI",  "(Cross Trigger)")},
 	{0x907, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight ETB",  "(Trace Buffer)")},
 	{0x908, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight CSTF", "(Trace Funnel)")},
+	{0x909, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight ATBR", "(Advanced Trace Bus Replicator)")},
 	{0x910, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight ETM9", "(Embedded Trace)")},
 	{0x912, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight TPIU", "(Trace Port Interface Unit)")},
 	{0x913, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight ITM",  "(Instrumentation Trace Macrocell)")},
@@ -187,24 +200,46 @@ static const struct {
 	{0x923, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M3 TPIU", "(Trace Port Interface Unit)")},
 	{0x924, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M3 ETM",  "(Embedded Trace)")},
 	{0x925, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M4 ETM",  "(Embedded Trace)")},
-	{0x930, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-R4 ETM",  "(Embedded Trace)")},
+  {0x930, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-R4 ETM",  "(Embedded Trace)")},
+
+	{0x931, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-R5 ETM",  "(Embedded Trace)")},
+	{0x932, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight MTB-M0+", "(Micro Trace Buffer)")},
 	{0x941, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight TPIU-Lite", "(Trace Port Interface Unit)")},
-	{0x950, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight Component", "(unidentified Cortex-A9 component)")},
-	{0x955, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight Component", "(unidentified Cortex-A5 component)")},
+	{0x950, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A9 PTM",  "(Program Trace Macrocell)")},
+	{0x955, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A5 ETM",  "(Embedded Trace)")},
+	{0x95a, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A72 ETM", "(Embedded Trace)")},
+	{0x95b, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A17 PTM", "(Program Trace Macrocell)")},
+	{0x95d, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A53 ETM", "(Embedded Trace)")},
+	{0x95e, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A57 ETM", "(Embedded Trace)")},
 	{0x95f, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A15 PTM", "(Program Trace Macrocell)")},
 	{0x961, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight TMC",  "(Trace Memory Controller)")},
 	{0x962, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight STM",  "(System Trace Macrocell)")},
+	{0x975, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M7 ETM",  "(Embedded Trace)")},
 	{0x9a0, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight PMU",  "(Performance Monitoring Unit)")},
 	{0x9a1, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M4 TPIU", "(Trace Port Interface Unit)")},
-	{0x9a5, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A5 ETM",  "(Embedded Trace)")},
+	{0x9a4, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("CoreSight GPR",  "(Granular Power Requester)")},
+	{0x9a5, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A5 PMU",  "(Performance Monitor Unit)")},
 	{0x9a7, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A7 PMU",  "(Performance Monitor Unit)")},
+	{0x9a8, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A53 CTI", "(Cross Trigger)")},
+	{0x9a9, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-M7 TPIU", "(Trace Port Interface Unit)")},
+	{0x9ae, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A17 PMU", "(Performance Monitor Unit)")},
 	{0x9af, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A15 PMU", "(Performance Monitor Unit)")},
+	{0x9b7, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-R7 PMU",  "(Performance Monitoring Unit)")},
+	{0x9d3, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A53 PMU", "(Performance Monitor Unit)")},
+	{0x9d7, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A57 PMU", "(Performance Monitor Unit)")},
+	{0x9d8, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A72 PMU", "(Performance Monitor Unit)")},
 	{0xc05, aa_cortexa,   cidc_dc,      PIDR_PN_BIT_STRINGS("Cortex-A5 Debug", "(Debug Unit)")},
 	{0xc07, aa_cortexa,   cidc_dc,      PIDR_PN_BIT_STRINGS("Cortex-A7 Debug", "(Debug Unit)")},
 	{0xc08, aa_cortexa,   cidc_dc,      PIDR_PN_BIT_STRINGS("Cortex-A8 Debug", "(Debug Unit)")},
 	{0xc09, aa_cortexa,   cidc_dc,      PIDR_PN_BIT_STRINGS("Cortex-A9 Debug", "(Debug Unit)")},
+	{0xc0e, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A17 Debug", "(Debug Unit)")}, /* support? */
 	{0xc0f, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A15 Debug", "(Debug Unit)")}, /* support? */
 	{0xc14, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-R4 Debug", "(Debug Unit)")}, /* support? */
+	{0xc15, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-R5 Debug", "(Debug Unit)")},
+	{0xc17, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-R7 Debug", "(Debug Unit)")},
+	{0xd03, aa_cortexa,   cidc_dc,      PIDR_PN_BIT_STRINGS("Cortex-A53 Debug", "(Debug Unit)")},
+	{0xd07, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A57 Debug", "(Debug Unit)")}, /* support? */
+	{0xd08, aa_nosupport, cidc_unknown, PIDR_PN_BIT_STRINGS("Cortex-A72 Debug", "(Debug Unit)")}, /* support? */
 	{0xfff, aa_end,       cidc_unknown, PIDR_PN_BIT_STRINGS("end", "end")}
 };
 
@@ -304,7 +339,8 @@ static void adiv5_component_probe(ADIv5_AP_t *ap, uint32_t addr)
 		/* Find the part number in our part list and run the appropriate probe
 		 * routine if applicable.
 		 */
-		for (int i = 0; pidr_pn_bits[i].arch != aa_end; i++) {
+		int i;
+		for (i = 0; pidr_pn_bits[i].arch != aa_end; i++) {
 			if (pidr_pn_bits[i].part_number == part_number) {
 				DEBUG("0x%X: %s %s\n", addr,
 				      pidr_pn_bits[i].type,
@@ -331,6 +367,9 @@ static void adiv5_component_probe(ADIv5_AP_t *ap, uint32_t addr)
 				}
 				break;
 			}
+		}
+		if (pidr_pn_bits[i].arch == aa_end) {
+			DEBUG("pn: 0x%X not found\n", part_number);
 		}
 	}
 }
