@@ -134,12 +134,14 @@ void platform_init(void)
 	 * and set LOW to assert.
 	 */
 	platform_srst_set_val(false);
-	gpio_set_mode(SRST_PORT, GPIO_MODE_OUTPUT_50_MHZ,
-			(((platform_hwversion() == 0) ||
-			  (platform_hwversion() >= 3))
+	gpio_set_mode(SRST1_PORT, GPIO_MODE_OUTPUT_50_MHZ,
+			((platform_hwversion() == 0)
 			 ? GPIO_CNF_OUTPUT_PUSHPULL
 			 : GPIO_CNF_OUTPUT_OPENDRAIN),
-			SRST_PIN);
+			SRST1_PIN);
+	gpio_set_mode(SRST2_PORT, GPIO_MODE_OUTPUT_50_MHZ,
+			GPIO_CNF_OUTPUT_OPENDRAIN,
+			SRST2_PIN);
 
 	/* Enable internal pull-up on PWR_BR so that we don't drive
 	   TPWR locally or inadvertently supply power to the target. */
@@ -177,9 +179,10 @@ void platform_init(void)
 void platform_srst_set_val(bool assert)
 {
 	if (platform_hwversion() == 0) {
-		gpio_set_val(SRST_PORT, SRST_PIN, assert);
+		gpio_set_val(SRST1_PORT, SRST1_PIN, assert);
 	} else {
-		gpio_set_val(SRST_PORT, SRST_PIN, !assert);
+		gpio_set_val(SRST1_PORT, SRST1_PIN, !assert);
+		gpio_set_val(SRST2_PORT, SRST2_PIN, !assert);
 	}
 	if (assert) {
 		for(int i = 0; i < 10000; i++) asm("nop");
@@ -191,7 +194,9 @@ bool platform_srst_get_val(void)
 	if (platform_hwversion() == 0) {
 		return gpio_get(SRST_PORT, SRST_SENSE_PIN) == 0;
 	} else {
-		return gpio_get(SRST_PORT, SRST_PIN) == 0;
+		return ((platform_hwversion() < 3)
+				? gpio_get(SRST1_PORT, SRST1_PIN) == 0
+				: gpio_get(SRST2_PORT, SRST2_PIN) == 0);
 	}
 }
 

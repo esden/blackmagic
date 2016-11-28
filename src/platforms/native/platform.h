@@ -51,12 +51,13 @@
  * nTRST = 	PB1 (output) [blackmagic]
  * PWR_BR = 	PB1 (output) [blackmagic_mini] -- supply power to the target, active low
  * TMS_DIR =    PA1 (output) [blackmagic_mini v2.1] -- choose direction of the TCK pin, input low, output high
- * SRST_OUT = 	PA2 (output)
+ * SRST1_OUT = 	PA2 (output)
+ * SRST2_OUT = 	PB14 (output) [blackmagic_mini > v2.1b] -- PA0-PA7 are not 5V tolerant
  * TDI = 	PA3 (output)
  * TMS = 	PA4 (input/output for SWDIO)
  * TCK = 	PA5 (output SWCLK)
  * TDO = 	PA6 (input)
- * nSRST = 	PA7 (input) (NOTE: ??? <esden>)
+ * nSRST = 	PA7 (input)
  *
  * USB cable pull-up: PA8
  * USB VBUS detect:  PB13 -- New on mini design.
@@ -90,6 +91,10 @@
 #define PWR_BR_PIN	GPIO1
 #define SRST_PORT	GPIOA
 #define SRST_PIN	GPIO2
+#define SRST1_PORT	GPIOA
+#define SRST1_PIN	GPIO2
+#define SRST2_PORT	GPIOB
+#define SRST2_PIN	GPIO14
 #define SRST_SENSE_PIN	GPIO7
 
 #define USB_PU_PORT	GPIOA
