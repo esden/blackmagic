@@ -112,13 +112,13 @@ void platform_init(void)
 
 	gpio_set_mode(JTAG_PORT, GPIO_MODE_OUTPUT_50_MHZ,
 			GPIO_CNF_OUTPUT_PUSHPULL,
-			TMS_PIN | TCK_PIN | TDI_PIN);
+			TMS_DIR_PIN | TMS_PIN | TCK_PIN | TDI_PIN);
 	/* This needs some fixing... */
 	/* Toggle required to sort out line drivers... */
-	gpio_port_write(GPIOA, 0x8100);
+	gpio_port_write(GPIOA, 0x8102);
 	gpio_port_write(GPIOB, 0x2000);
 
-	gpio_port_write(GPIOA, 0x8180);
+	gpio_port_write(GPIOA, 0x8182);
 	gpio_port_write(GPIOB, 0x2002);
 
 	gpio_set_mode(LED_PORT, GPIO_MODE_OUTPUT_2_MHZ,
@@ -135,9 +135,10 @@ void platform_init(void)
 	 */
 	platform_srst_set_val(false);
 	gpio_set_mode(SRST_PORT, GPIO_MODE_OUTPUT_50_MHZ,
-			(platform_hwversion() == 0
-				? GPIO_CNF_OUTPUT_PUSHPULL
-				: GPIO_CNF_OUTPUT_OPENDRAIN),
+			(((platform_hwversion() == 0) ||
+			  (platform_hwversion() >= 3))
+			 ? GPIO_CNF_OUTPUT_PUSHPULL
+			 : GPIO_CNF_OUTPUT_OPENDRAIN),
 			SRST_PIN);
 
 	/* Enable internal pull-up on PWR_BR so that we don't drive
